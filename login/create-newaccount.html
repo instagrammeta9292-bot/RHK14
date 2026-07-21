@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - RHK App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="login-header">
+            <h2>Create Account</h2>
+            <p>Sign up with a profile picture</p>
+        </div>
+
+        <form id="registerForm">
+            <div class="input-group">
+                <label for="newUsername">Username</label>
+                <input type="text" id="newUsername" placeholder="Choose a username" required>
+            </div>
+
+            <div class="input-group">
+                <label for="newPassword">Password</label>
+                <input type="password" id="newPassword" placeholder="Choose a password" required>
+            </div>
+
+            <div class="input-group">
+                <label for="profilePic">Profile Picture</label>
+                <input type="file" id="profilePic" accept="image/*" required>
+            </div>
+
+            <button type="submit" id="registerBtn" class="btn primary-btn">Register Account</button>
+        </form>
+
+        <div id="regErrorMsg" class="error-msg"></div>
+
+        <div class="divider">
+            <span>or</span>
+        </div>
+
+        <button type="button" id="backToLoginBtn" class="btn secondary-btn">Back to Login</button>
+    </div>
+
+    <!-- Firebase & Cloudinary Integration -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyAHUju18VBAdDFoQJhsVWp7oUqBxhfwThE",
+          authDomain: "rhk-app-e34c6.firebaseapp.com",
+          projectId: "rhk-app-e34c6",
+          storageBucket: "rhk-app-e34c6.firebasestorage.app",
+          messagingSenderId: "1016565109006",
+          appId: "1:1016565109006:web:eb7ec260a601a16e5ac75f",
+          measurementId: "G-814PTRRQVQ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const CLOUD_NAME = "nhy9lfkt";
+        const UPLOAD_PRESET = "rhk_upload";
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('newUsername').value.trim();
+            const password = document.getElementById('newPassword').value.trim();
+            const fileField = document.getElementById('profilePic').files[0];
+            const regErrorMsg = document.getElementById('regErrorMsg');
+            const registerBtn = document.getElementById('registerBtn');
+
+            regErrorMsg.textContent = "";
+            registerBtn.textContent = "Creating Account...";
+            registerBtn.disabled = true;
+
+            try {
+                // 1. Check if username already exists in Firebase
+                const usersRef = collection(db, "users");
+                const q = query(usersRef, where("username", "==", username));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    regErrorMsg.textContent = "Username already exists. Choose another.";
+                    registerBtn.textContent = "Register Account";
+                    registerBtn.disabled = false;
+                    return;
+                }
+
+                // 2. Upload Profile Picture to Cloudinary
+                const formData = new FormData();
+                formData.append("file", fileField);
+                formData.append("upload_preset", UPLOAD_PRESET);
+
+                const cloudinaryRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+                    method: "POST",
+                    body: formData
+                });
+
+                const cloudinaryData = await cloudinaryRes.json();
+                if (!cloudinaryRes.ok) {
+                    throw new Error(cloudinaryData.error?.message || "Failed to upload image to Cloudinary.");
+                }
+
+                const profilePicUrl = cloudinaryData.secure_url;
+
+                // 3. Save User Data to Firestore
+                await addDoc(collection(db, "users"), {
+                    username: username,
+                    password: password,
+                    profilePic: profilePicUrl,
+                    createdAt: new Date().toISOString()
+                });
+
+                alert("Account created successfully! Please log in.");
+                window.location.href = "login.html";
+
+            } catch (error) {
+                console.error("Registration error:", error);
+                regErrorMsg.textContent = error.message || "Registration failed. Try again.";
+                registerBtn.textContent = "Register Account";
+                registerBtn.disabled = false;
+            }
+        });
+
+        document.getElementById('backToLoginBtn').addEventListener('click', () => {
+            window.location.href = "login.html";
+        });
+    </script>
+</body>
+</html>
+
