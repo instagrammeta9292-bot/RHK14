@@ -3,143 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RHK - Luxury Portal</title>
+    <title>RHK - Portal</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div class="phone-frame">
-        <div class="screen-container">
+    <div class="container">
+        <!-- Auth Card -->
+        <div class="auth-box" id="authBox">
+            <h2 id="formTitle">RHK Login</h2>
+            <p id="formSubtitle" class="subtitle">Enter your credentials to continue</p>
 
-            <!-- 1. SIGN IN SCREEN -->
-            <div id="login-screen" class="view">
-                <div class="brand-header">
-                    <h1>RHK</h1>
-                    <p>SIGN IN TO RHK</p>
-                </div>
-
-                <div id="login-form">
-                    <div class="input-group">
-                        <label>Username</label>
-                        <div class="input-field-wrapper">
-                            <span class="icon">👤</span>
-                            <input type="text" id="login-username" placeholder="username" required>
-                        </div>
+            <form id="authForm">
+                <div class="input-group">
+                    <label for="usernameInput">Username</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="usernameInput" placeholder="username" required autocomplete="username">
+                        <span class="domain-suffix">@gmail.com</span>
                     </div>
-
-                    <div class="input-group">
-                        <label>Password</label>
-                        <div class="input-field-wrapper">
-                            <span class="icon">🔒</span>
-                            <input type="password" id="login-password" placeholder="password" required>
-                            <span class="toggle-password" id="toggle-login-pass">👁️</span>
-                        </div>
-                    </div>
-
-                    <button type="button" id="login-btn-action" class="btn-primary">SIGN IN</button>
                 </div>
 
-                <div class="extra-links">
-                    <a href="#" id="show-forgot">Forgot Password?</a>
+                <div class="input-group">
+                    <label for="passwordInput">Password</label>
+                    <input type="password" id="passwordInput" placeholder="••••••••" required autocomplete="current-password">
                 </div>
 
-                <div class="divider">
-                    <span>OR</span>
-                </div>
+                <button type="submit" id="submitBtn" class="primary-btn">Log In</button>
+            </form>
 
-                <button type="button" id="show-signup" class="btn-outline">CREATE A NEW ACCOUNT</button>
-            </div>
+            <p class="switch-text">
+                <span id="toggleText">Don't have an account?</span> 
+                <a href="#" id="toggleLink">Create one</a>
+            </p>
+            <div id="errorMessage" class="error-msg"></div>
+        </div>
 
-            <!-- 2. CREATE ACCOUNT SCREEN -->
-            <div id="signup-screen" class="view hidden">
-                <div class="brand-header">
-                    <h1>RHK</h1>
-                    <p>CREATE NEW ACCOUNT</p>
-                </div>
-
-                <div id="signup-form">
-                    <div class="avatar-upload-container">
-                        <label for="signup-avatar" class="avatar-label">
-                            <img id="avatar-preview" src="" alt="Avatar" class="hidden">
-                            <span id="avatar-placeholder">+ Add Photo</span>
-                        </label>
-                        <input type="file" id="signup-avatar" accept="image/*">
-                    </div>
-
-                    <div class="input-group">
-                        <label>Username</label>
-                        <div class="input-field-wrapper">
-                            <span class="icon">👤</span>
-                            <input type="text" id="signup-username" placeholder="choose username" required>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label>Email (for login & recovery)</label>
-                        <div class="input-field-wrapper">
-                            <span class="icon">✉️</span>
-                            <input type="email" id="signup-email" placeholder="name@example.com" required>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label>Password</label>
-                        <div class="input-field-wrapper">
-                            <span class="icon">🔒</span>
-                            <input type="password" id="signup-password" placeholder="create password" required>
-                        </div>
-                    </div>
-
-                    <button type="button" id="signup-btn-action" class="btn-primary">REGISTER ACCOUNT</button>
-                </div>
-
-                <div class="extra-links center-link">
-                    <a href="#" id="show-login-from-signup">Back to Sign In</a>
-                </div>
-            </div>
-
-            <!-- 3. FORGOT PASSWORD SCREEN -->
-            <div id="forgot-screen" class="view hidden">
-                <div class="brand-header">
-                    <h1>RHK</h1>
-                    <p>RESET PASSWORD</p>
-                </div>
-
-                <div id="forgot-form">
-                    <p class="instruction-text">Enter your registered email address to receive a password reset link.</p>
-                    <div class="input-group">
-                        <label>Email Address</label>
-                        <div class="input-field-wrapper">
-                            <span class="icon">✉️</span>
-                            <input type="email" id="forgot-input" placeholder="name@example.com" required>
-                        </div>
-                    </div>
-
-                    <button type="button" id="forgot-btn-action" class="btn-primary">SEND RESET LINK</button>
-                </div>
-
-                <div class="extra-links center-link">
-                    <a href="#" id="show-login-from-forgot">Back to Sign In</a>
-                </div>
-            </div>
-
-            <!-- 4. DASHBOARD / HOME SCREEN -->
-            <div id="dashboard-screen" class="view hidden">
-                <div class="dashboard-header">
-                    <h2>RHK PORTAL</h2>
-                    <button id="logout-btn" class="btn-danger">Logout</button>
-                </div>
-                <div class="dashboard-content">
-                    <img id="dash-avatar" src="" alt="Profile">
-                    <h3 id="dash-username"></h3>
-                    <p class="success-msg">Welcome to your secure RHK dashboard workspace.</p>
-                </div>
-            </div>
-
+        <!-- Dashboard / Welcome Screen (Hidden by default) -->
+        <div class="dashboard-box hidden" id="dashboardBox">
+            <h2>Welcome to RHK, <span id="userDisplayEmail"></span>!</h2>
+            <p class="subtitle">You are successfully logged in.</p>
+            <button id="logoutBtn" class="secondary-btn">Log Out</button>
         </div>
     </div>
 
-    <script type="module" src="app.js"></script>
+    <!-- Firebase SDKs (Modular v10+) -->
+    <script type="module" src="script.js"></script>
 </body>
 </html>
+
