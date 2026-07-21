@@ -25,7 +25,6 @@ body {
     align-items: center;
 }
 
-/* Phone Mockup Frame Container */
 .phone-frame {
     width: 100%;
     max-width: 410px;
@@ -75,10 +74,9 @@ body {
     display: none !important;
 }
 
-/* Brand Header */
 .brand-header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
 .brand-header h1 {
@@ -98,17 +96,11 @@ body {
     font-weight: 600;
 }
 
-/* Form Styles */
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-}
-
 .input-group {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    margin-bottom: 14px;
 }
 
 .input-group label {
@@ -126,12 +118,10 @@ form {
     border: 1px solid var(--metallic-border);
     border-radius: 12px;
     padding: 0 14px;
-    transition: border-color 0.2s;
 }
 
 .input-field-wrapper:focus-within {
     border-color: var(--gold);
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.15);
 }
 
 .input-field-wrapper .icon {
@@ -143,7 +133,7 @@ form {
     width: 100%;
     background: transparent;
     border: none;
-    padding: 14px 0;
+    padding: 12px 0;
     color: var(--text-main);
     font-size: 0.95rem;
     outline: none;
@@ -159,15 +149,10 @@ form {
     opacity: 0.7;
 }
 
-.toggle-password:hover {
-    opacity: 1;
-}
-
-/* Buttons */
 .btn-primary {
-    margin-top: 6px;
+    margin-top: 4px;
     width: 100%;
-    padding: 15px;
+    padding: 14px;
     background: linear-gradient(135deg, #e6c553 0%, #b89726 100%);
     border: none;
     border-radius: 12px;
@@ -177,11 +162,6 @@ form {
     letter-spacing: 1px;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
-    transition: transform 0.1s, opacity 0.2s;
-}
-
-.btn-primary:active {
-    transform: scale(0.98);
 }
 
 .btn-outline {
@@ -195,42 +175,33 @@ form {
     font-size: 0.9rem;
     letter-spacing: 1px;
     cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
 }
 
 .btn-outline:hover {
-    background: rgba(212, 175, 55, 0.05);
     border-color: var(--gold);
 }
 
-/* Links & Dividers */
 .extra-links {
     text-align: right;
-    margin-top: 10px;
+    margin-top: 8px;
 }
 
 .extra-links a {
     color: var(--gold);
     font-size: 0.85rem;
     text-decoration: none;
-    transition: color 0.2s;
-}
-
-.extra-links a:hover {
-    color: var(--gold-light);
-    text-decoration: underline;
 }
 
 .center-link {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 .divider {
     display: flex;
     align-items: center;
     text-align: center;
-    margin: 20px 0;
+    margin: 16px 0;
     color: var(--text-muted);
 }
 
@@ -243,19 +214,17 @@ form {
 .divider span {
     padding: 0 12px;
     font-size: 0.75rem;
-    letter-spacing: 1px;
 }
 
-/* Avatar Upload for Signup */
 .avatar-upload-container {
     display: flex;
     justify-content: center;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
 }
 
 .avatar-label {
-    width: 75px;
-    height: 75px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     border: 2px dashed var(--gold);
     display: flex;
@@ -264,11 +233,6 @@ form {
     cursor: pointer;
     overflow: hidden;
     background: rgba(212, 175, 55, 0.05);
-    transition: background 0.2s;
-}
-
-.avatar-label:hover {
-    background: rgba(212, 175, 55, 0.1);
 }
 
 #avatar-preview {
@@ -278,10 +242,10 @@ form {
 }
 
 #avatar-placeholder {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: var(--gold);
     text-align: center;
-    padding: 4px;
+    padding: 2px;
 }
 
 #signup-avatar {
@@ -293,10 +257,8 @@ form {
     color: var(--text-muted);
     text-align: center;
     margin-bottom: 15px;
-    line-height: 1.4;
 }
 
-/* Dashboard View */
 #dashboard-screen {
     justify-content: flex-start;
 }
@@ -306,9 +268,9 @@ form {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 20px;
+    padding-bottom: 15px;
     border-bottom: 1px solid var(--metallic-border);
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
 .dashboard-header h2 {
@@ -333,7 +295,7 @@ form {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 16px;
+    gap: 14px;
 }
 
 #dash-avatar {
@@ -342,13 +304,11 @@ form {
     border-radius: 50%;
     border: 2px solid var(--gold);
     object-fit: cover;
-    box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
 }
 
 #dash-username {
     font-size: 1.4rem;
     color: var(--text-main);
-    letter-spacing: 1px;
 }
 
 .success-msg {
