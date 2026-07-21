@@ -20,7 +20,6 @@ const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/nhy9lfkt/image/upload";
 const UPLOAD_PRESET = "rhk_upload";
 
 // DOM Elements
-const splashScreen = document.getElementById("splash-screen");
 const loginScreen = document.getElementById("login-screen");
 const signupScreen = document.getElementById("signup-screen");
 const dashboardScreen = document.getElementById("dashboard-screen");
@@ -50,39 +49,26 @@ avatarInput.addEventListener("change", (e) => {
 
 // Switch screens helper
 function showScreen(screen) {
-    [splashScreen, loginScreen, signupScreen, dashboardScreen].forEach(s => s.classList.add("hidden"));
+    [loginScreen, signupScreen, dashboardScreen].forEach(s => s.classList.add("hidden"));
     screen.classList.remove("hidden");
 }
 
-// Splash Screen Logic with Auth State Observer
-console.log("App initializing, starting splash screen timer...");
-
-setTimeout(() => {
-    console.log("Splash timer finished, checking Firebase Auth state...");
-    
-    // Safety fallback: if Firebase takes too long, force show login screen after 5 more seconds
-    const fallbackTimer = setTimeout(() => {
-        console.warn("Auth state change timed out. Forcing login screen.");
-        showScreen(loginScreen);
-    }, 5000);
-
-    onAuthStateChanged(auth, async (user) => {
-        clearTimeout(fallbackTimer); // Clear fallback since Firebase responded
-        if (user) {
-            console.log("User is logged in:", user.uid);
-            try {
-                await loadDashboard(user.uid);
-                showScreen(dashboardScreen);
-            } catch (err) {
-                console.error("Error loading dashboard data:", err);
-                showScreen(loginScreen);
-            }
-        } else {
-            console.log("No user logged in. Showing login screen.");
+// Instant Auth State Check (No delay/splash screen)
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        // User is logged in -> Directly go to Home/Dashboard page
+        try {
+            await loadDashboard(user.uid);
+            showScreen(dashboardScreen);
+        } catch (err) {
+            console.error("Error loading dashboard data:", err);
             showScreen(loginScreen);
         }
-    });
-}, 2000);
+    } else {
+        // Not logged in -> Show login page
+        showScreen(loginScreen);
+    }
+});
 
 // Toggle Navigation Links
 showSignupLink.addEventListener("click", (e) => {
