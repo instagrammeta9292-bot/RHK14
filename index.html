@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RHK - Luxury Portal</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Google Fonts for Luxury Serif typography -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -20,7 +19,7 @@
                     <p>SIGN IN TO RHK</p>
                 </div>
 
-                <form id="login-form">
+                <form id="login-form" onsubmit="return false;">
                     <div class="input-group">
                         <label>Username</label>
                         <div class="input-field-wrapper">
@@ -38,7 +37,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-primary">SIGN IN</button>
+                    <button type="button" id="login-btn-action" class="btn-primary">SIGN IN</button>
                 </form>
 
                 <div class="extra-links">
@@ -49,7 +48,7 @@
                     <span>OR</span>
                 </div>
 
-                <button id="show-signup" class="btn-outline">CREATE A NEW ACCOUNT</button>
+                <button type="button" id="show-signup" class="btn-outline">CREATE A NEW ACCOUNT</button>
             </div>
 
             <!-- 2. CREATE ACCOUNT SCREEN -->
@@ -59,7 +58,7 @@
                     <p>CREATE NEW ACCOUNT</p>
                 </div>
 
-                <form id="signup-form">
+                <form id="signup-form" onsubmit="return false;">
                     <div class="avatar-upload-container">
                         <label for="signup-avatar" class="avatar-label">
                             <img id="avatar-preview" src="" alt="Avatar" class="hidden">
@@ -92,7 +91,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-primary">REGISTER ACCOUNT</button>
+                    <button type="button" id="signup-btn-action" class="btn-primary">REGISTER ACCOUNT</button>
                 </form>
 
                 <div class="extra-links center-link">
@@ -107,7 +106,7 @@
                     <p>RESET PASSWORD</p>
                 </div>
 
-                <form id="forgot-form">
+                <form id="forgot-form" onsubmit="return false;">
                     <p class="instruction-text">Enter your account username or registered email to receive a password reset link.</p>
                     <div class="input-group">
                         <label>Username or Email</label>
@@ -117,7 +116,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-primary">SEND RESET LINK</button>
+                    <button type="button" id="forgot-btn-action" class="btn-primary">SEND RESET LINK</button>
                 </form>
 
                 <div class="extra-links center-link">
