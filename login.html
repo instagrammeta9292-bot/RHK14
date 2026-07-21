@@ -13,21 +13,26 @@
 
     <div class="logo">RHK</div>
 
-    <h2>RHK BRAND</h2>
+    <h1 class="title">Welcome</h1>
+    <p class="subtitle">Login to your RHK BRAND account</p>
 
-    <input
-        type="text"
-        id="username"
-        placeholder="Username"
-        autocomplete="username"
-    >
+    <div class="input-group">
+        <label>Username</label>
+        <input
+            type="text"
+            id="username"
+            placeholder="Enter username"
+            autocomplete="username">
+    </div>
 
-    <input
-        type="password"
-        id="password"
-        placeholder="Password"
-        autocomplete="current-password"
-    >
+    <div class="input-group">
+        <label>Password</label>
+        <input
+            type="password"
+            id="password"
+            placeholder="Enter password"
+            autocomplete="current-password">
+    </div>
 
     <button id="loginBtn">
         Login
@@ -38,8 +43,7 @@
     <p id="message"></p>
 
     <div class="link">
-        Don't have an account?
-        <br><br>
+        Don't have an account?<br><br>
 
         <a href="create-newaccount.html">
             Create New Account
@@ -48,7 +52,6 @@
 
 </div>
 
-<!-- Login Script -->
 <script type="module" src="login.js"></script>
 
 </body>
