@@ -1,71 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RHK BRAND - Home</title>
 
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        .home-box{
-            width:360px;
-            background:#fff;
-            padding:30px;
-            border-radius:20px;
-            text-align:center;
-            box-shadow:0 15px 40px rgba(0,0,0,.3);
-        }
+<title>RHK CHAT</title>
 
-        .home-photo{
-            width:120px;
-            height:120px;
-            border-radius:50%;
-            object-fit:cover;
-            border:4px solid #000;
-            margin-bottom:15px;
-        }
+<link rel="stylesheet" href="css/home.css">
 
-        .home-box h1{
-            margin-bottom:8px;
-            color:#111;
-        }
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
-        .home-box p{
-            color:#666;
-            margin-bottom:20px;
-        }
-
-        #logoutBtn{
-            background:#e53935;
-        }
-
-        #logoutBtn:hover{
-            background:#c62828;
-        }
-    </style>
 </head>
+
 <body>
 
-<div class="home-box">
+<div class="container">
 
-    <img
-        id="profilePhoto"
-        class="home-photo"
-        src=""
-        alt="Profile">
+    <!-- Header -->
+    <div class="header">
 
-    <h1 id="username">Username</h1>
+        <div class="left">
 
-    <p>Welcome to RHK BRAND</p>
+            <img id="myPhoto"
+                 class="avatar"
+                 src="https://cdn-icons-png.flaticon.com/512/149/149071.png">
 
-    <button id="logoutBtn">
-        Logout
-    </button>
+            <div>
+
+                <h2 id="myName">Loading...</h2>
+
+                <small>Online</small>
+
+            </div>
+
+        </div>
+
+        <button id="logoutBtn">
+            Logout
+        </button>
+
+    </div>
+
+    <!-- Chat Messages -->
+    <div id="messages" class="messages">
+
+    </div>
+
+    <!-- Image Preview -->
+    <div id="previewBox" class="previewBox" style="display:none;">
+
+        <img id="previewImage">
+
+    </div>
+
+    <!-- Bottom Chat Bar -->
+    <div class="bottom">
+
+        <input
+            type="text"
+            id="message"
+            placeholder="Type a message...">
+
+        <input
+            type="file"
+            id="imageFile"
+            accept="image/*"
+            hidden>
+
+        <button id="photoBtn">
+            📷
+        </button>
+
+        <button id="sendBtn">
+            Send
+        </button>
+
+    </div>
 
 </div>
 
-<script type="module" src="home.js"></script>
+<script>
+document.getElementById("photoBtn").onclick=function(){
+    document.getElementById("imageFile").click();
+};
+
+document.getElementById("imageFile").onchange=function(){
+
+const file=this.files[0];
+
+if(file){
+
+document.getElementById("previewBox").style.display="block";
+
+document.getElementById("previewImage").src=
+URL.createObjectURL(file);
+
+}
+
+};
+</script>
+
+<script src="js/firebase.js"></script>
+<script src="js/home.js"></script>
 
 </body>
+
 </html>
