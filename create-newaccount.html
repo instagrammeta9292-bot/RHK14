@@ -1,85 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Account - RHK BRAND</title>
 
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Create Account - RHK BRAND</title>
+
+<link rel="stylesheet" href="style.css">
+
 </head>
+
 <body>
 
 <div class="container">
 
     <div class="logo">RHK</div>
 
-    <h2>Create New Account</h2>
+    <h1 class="title">Create Account</h1>
 
-    <!-- Profile Photo Preview -->
+    <p class="subtitle">
+        Create your RHK BRAND account
+    </p>
+
     <img
         id="preview"
         class="profile-preview"
-        src="https://via.placeholder.com/120?text=Photo"
+        src="https://placehold.co/120x120/png?text=Photo"
         alt="Profile Photo">
 
-    <!-- Select Photo -->
-    <input
-        type="file"
-        id="photo"
-        accept="image/*">
+    <div class="input-group">
 
-    <!-- Username -->
-    <input
-        type="text"
-        id="username"
-        placeholder="Choose Username">
+        <label>Profile Photo</label>
 
-    <!-- Password -->
-    <input
-        type="password"
-        id="password"
-        placeholder="Choose Password">
+        <input
+            type="file"
+            id="photo"
+            accept="image/*">
 
-    <!-- Create Button -->
+    </div>
+
+    <div class="input-group">
+
+        <label>Username</label>
+
+        <input
+            type="text"
+            id="username"
+            placeholder="Choose Username">
+
+    </div>
+
+    <div class="input-group">
+
+        <label>Password</label>
+
+        <input
+            type="password"
+            id="password"
+            placeholder="Choose Password">
+
+    </div>
+
     <button id="createBtn">
+
         Create Account
+
     </button>
 
-    <!-- Loading -->
-    <div class="loading" id="loading"></div>
+    <div
+        class="loading"
+        id="loading">
+    </div>
 
-    <!-- Message -->
     <p id="message"></p>
 
     <div class="link">
+
         Already have an account?
+
         <br><br>
 
         <a href="login.html">
-            Login Here
+
+            Login
+
         </a>
+
     </div>
 
 </div>
 
-<script type="module" src="signup.js"></script>
-
 <script>
-const photo = document.getElementById("photo");
-const preview = document.getElementById("preview");
 
-photo.onchange = function(){
+const photo=document.getElementById("photo");
+const preview=document.getElementById("preview");
 
-    const file = this.files[0];
+photo.addEventListener("change",()=>{
+
+    const file=photo.files[0];
 
     if(file){
 
-        preview.src = URL.createObjectURL(file);
+        preview.src=URL.createObjectURL(file);
 
     }
 
-}
+});
+
 </script>
+
+<script type="module" src="signup.js"></script>
 
 </body>
 </html>
