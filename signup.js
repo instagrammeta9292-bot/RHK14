@@ -1,116 +1,64 @@
-import { db } from "./firebase.js";
+<!DOCTYPE html>
+<html lang="en">
 
-import {
-    doc,
-    getDoc,
-    setDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-const CLOUD_NAME = "nhy9lfkt";
-const UPLOAD_PRESET = "rhk_upload";
+<title>Create Account - RHK CHAT</title>
 
-const username = document.getElementById("username");
-const password = document.getElementById("password");
-const photo = document.getElementById("photo");
+<link rel="stylesheet" href="css/style.css">
 
-const createBtn = document.getElementById("createBtn");
-const loading = document.getElementById("loading");
-const message = document.getElementById("message");
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
-createBtn.addEventListener("click", createAccount);
+</head>
 
-async function createAccount() {
+<body>
 
-    message.textContent = "";
+<div class="login-box">
 
-    const user = username.value.trim();
-    const pass = password.value.trim();
-    const file = photo.files[0];
+    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+         class="logo">
 
-    if (user.length < 4) {
-        message.textContent = "Username must be at least 4 characters.";
-        return;
-    }
+    <h1>Create Account</h1>
 
-    if (pass.length < 6) {
-        message.textContent = "Password must be at least 6 characters.";
-        return;
-    }
+    <p>Create your RHK CHAT account</p>
 
-    if (!file) {
-        message.textContent = "Please select a profile photo.";
-        return;
-    }
+    <input
+        type="email"
+        id="email"
+        placeholder="Email Address">
 
-    loading.style.display = "block";
-    createBtn.disabled = true;
+    <input
+        type="password"
+        id="password"
+        placeholder="Password">
 
-    try {
+    <input
+        type="password"
+        id="confirmPassword"
+        placeholder="Confirm Password">
 
-        // Check if username already exists
-        const userRef = doc(db, "users", user);
-        const userSnap = await getDoc(userRef);
+    <button id="createBtn">
+        Create Account
+    </button>
 
-        if (userSnap.exists()) {
+    <button
+        class="createBtn"
+        onclick="location.href='index.html'">
+        Back to Login
+    </button>
 
-            loading.style.display = "none";
-            createBtn.disabled = false;
+    <p id="msg" style="margin-top:15px;color:red;"></p>
 
-            message.textContent = "Username already exists.";
-            return;
-        }
+</div>
 
-        // Upload image to Cloudinary
-        const formData = new FormData();
+<script src="js/firebase.js"></script>
+<script src="js/signup.js"></script>
 
-        formData.append("file", file);
-        formData.append("upload_preset", UPLOAD_PRESET);
+</body>
 
-        const response = await fetch(
-            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-            {
-                method: "POST",
-                body: formData
-            }
-        );
-
-        const image = await response.json();
-
-        if (!image.secure_url) {
-
-            loading.style.display = "none";
-            createBtn.disabled = false;
-
-            message.textContent = "Image upload failed.";
-            return;
-        }
-
-        const profilePhoto = image.secure_url;
-                // Save user in Firestore
-        await setDoc(userRef, {
-            username: user,
-            password: pass,
-            profilePhoto: profilePhoto,
-            createdAt: new Date().toISOString()
-        });
-
-        loading.style.display = "none";
-        createBtn.disabled = false;
-
-        alert("Account created successfully!");
-
-        // Redirect to login page
-        window.location.href = "login.html";
-
-    } catch (error) {
-
-        console.error(error);
-
-        loading.style.display = "none";
-        createBtn.disabled = false;
-
-        message.textContent = "Failed to create account. Please try again.";
-
-    }
-
-}
+</html>
