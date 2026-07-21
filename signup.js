@@ -1,12 +1,13 @@
 import { db } from "./firebase.js";
 
 import {
-    collection,
-    query,
-    where,
-    getDocs,
-    addDoc
+    doc,
+    getDoc,
+    setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const CLOUD_NAME = "nhy9lfkt";
+const UPLOAD_PRESET = "rhk_upload";
 
 const username = document.getElementById("username");
 const password = document.getElementById("password");
@@ -16,27 +17,28 @@ const createBtn = document.getElementById("createBtn");
 const loading = document.getElementById("loading");
 const message = document.getElementById("message");
 
-// Cloudinary
-const CLOUD_NAME = "nhy9lfkt";
-const UPLOAD_PRESET = "rhk_upload";
-
 createBtn.addEventListener("click", createAccount);
 
 async function createAccount() {
 
-    message.innerHTML = "";
+    message.textContent = "";
 
     const user = username.value.trim();
     const pass = password.value.trim();
     const file = photo.files[0];
 
-    if (user === "" || pass === "") {
-        message.innerHTML = "Please fill all fields.";
+    if (user.length < 4) {
+        message.textContent = "Username must be at least 4 characters.";
+        return;
+    }
+
+    if (pass.length < 6) {
+        message.textContent = "Password must be at least 6 characters.";
         return;
     }
 
     if (!file) {
-        message.innerHTML = "Please choose a profile photo.";
+        message.textContent = "Please select a profile photo.";
         return;
     }
 
@@ -45,29 +47,26 @@ async function createAccount() {
 
     try {
 
-        // Check username already exists
-        const q = query(
-            collection(db, "users"),
-            where("username", "==", user)
-        );
+        // Check if username already exists
+        const userRef = doc(db, "users", user);
+        const userSnap = await getDoc(userRef);
 
-        const snap = await getDocs(q);
-
-        if (!snap.empty) {
+        if (userSnap.exists()) {
 
             loading.style.display = "none";
             createBtn.disabled = false;
 
-            message.innerHTML = "Username already exists.";
+            message.textContent = "Username already exists.";
             return;
         }
 
         // Upload image to Cloudinary
         const formData = new FormData();
+
         formData.append("file", file);
         formData.append("upload_preset", UPLOAD_PRESET);
 
-        const upload = await fetch(
+        const response = await fetch(
             `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
             {
                 method: "POST",
@@ -75,31 +74,32 @@ async function createAccount() {
             }
         );
 
-        const imageData = await upload.json();
+        const image = await response.json();
 
-        if (!imageData.secure_url) {
+        if (!image.secure_url) {
 
             loading.style.display = "none";
             createBtn.disabled = false;
 
-            message.innerHTML = "Image upload failed.";
+            message.textContent = "Image upload failed.";
             return;
         }
 
-        // Save user in Firestore
-        await addDoc(collection(db, "users"), {
-
+        const profilePhoto = image.secure_url;
+                // Save user in Firestore
+        await setDoc(userRef, {
             username: user,
             password: pass,
-            profilePhoto: imageData.secure_url,
+            profilePhoto: profilePhoto,
             createdAt: new Date().toISOString()
-
         });
 
         loading.style.display = "none";
+        createBtn.disabled = false;
 
         alert("Account created successfully!");
 
+        // Redirect to login page
         window.location.href = "login.html";
 
     } catch (error) {
@@ -109,7 +109,7 @@ async function createAccount() {
         loading.style.display = "none";
         createBtn.disabled = false;
 
-        message.innerHTML = "Something went wrong.";
+        message.textContent = "Failed to create account. Please try again.";
 
     }
 
