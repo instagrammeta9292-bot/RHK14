@@ -54,14 +54,31 @@ function showScreen(screen) {
     screen.classList.remove("hidden");
 }
 
-// Splash Screen Logic (Display for 2 seconds, then evaluate auth)
+// Splash Screen Logic with Auth State Observer
+console.log("App initializing, starting splash screen timer...");
+
 setTimeout(() => {
+    console.log("Splash timer finished, checking Firebase Auth state...");
+    
+    // Safety fallback: if Firebase takes too long, force show login screen after 5 more seconds
+    const fallbackTimer = setTimeout(() => {
+        console.warn("Auth state change timed out. Forcing login screen.");
+        showScreen(loginScreen);
+    }, 5000);
+
     onAuthStateChanged(auth, async (user) => {
+        clearTimeout(fallbackTimer); // Clear fallback since Firebase responded
         if (user) {
-            // User session is persistent until logout
-            await loadDashboard(user.uid);
-            showScreen(dashboardScreen);
+            console.log("User is logged in:", user.uid);
+            try {
+                await loadDashboard(user.uid);
+                showScreen(dashboardScreen);
+            } catch (err) {
+                console.error("Error loading dashboard data:", err);
+                showScreen(loginScreen);
+            }
         } else {
+            console.log("No user logged in. Showing login screen.");
             showScreen(loginScreen);
         }
     });
@@ -105,7 +122,6 @@ signupForm.addEventListener("submit", async (e) => {
     const file = avatarInput.files[0];
 
     try {
-        // 1. Check if username is already taken in Firestore
         const usernameQuery = query(collection(db, "users"), where("username", "==", username));
         const usernameSnapshot = await getDocs(usernameQuery);
         if (!usernameSnapshot.empty) {
@@ -113,14 +129,10 @@ signupForm.addEventListener("submit", async (e) => {
             return;
         }
 
-        // 2. Upload profile photo to Cloudinary
         const photoUrl = await uploadToCloudinary(file);
-
-        // 3. Create Firebase Auth user using email/password
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // 4. Save extra profile data (username, photoUrl) mapped to user.uid
         await setDoc(doc(db, "users", user.uid), {
             uid: user.uid,
             username: username,
@@ -137,14 +149,13 @@ signupForm.addEventListener("submit", async (e) => {
     }
 });
 
-// LOGIN LOGIC (Using Username mapping to Firebase Email)
+// LOGIN LOGIC
 loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const username = document.getElementById("login-username").value.trim();
     const password = document.getElementById("login-password").value.trim();
 
     try {
-        // Find email associated with the entered username
         const usernameQuery = query(collection(db, "users"), where("username", "==", username));
         const querySnapshot = await getDocs(usernameQuery);
 
@@ -156,7 +167,6 @@ loginForm.addEventListener("submit", async (e) => {
         const userData = querySnapshot.docs[0].data();
         const email = userData.email;
 
-        // Sign in using resolved email and password
         await signInWithEmailAndPassword(auth, email, password);
         await loadDashboard(userData.uid);
         showScreen(dashboardScreen);
@@ -176,7 +186,7 @@ async function loadDashboard(uid) {
     }
 }
 
-// LOGOUT LOGIC (Session ends only when user explicitly clicks logout)
+// LOGOUT LOGIC
 logoutBtn.addEventListener("click", async () => {
     try {
         await signOut(auth);
@@ -185,4 +195,3 @@ logoutBtn.addEventListener("click", async () => {
         console.error("Logout error:", error);
     }
 });
-
