@@ -3,94 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RHK - Chat Portal</title>
+    <title>Login Portal</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="container">
-        <!-- Auth Card -->
-        <div class="auth-box" id="authBox">
-            <h2 id="formTitle">RHK Login</h2>
-            <p id="formSubtitle" class="subtitle">Enter your credentials to continue</p>
-
-            <form id="authForm">
-                <div class="input-group">
-                    <label for="usernameInput">Username</label>
-                    <div class="input-wrapper">
-                        <input type="text" id="usernameInput" placeholder="username" required autocomplete="username">
-                        <span class="domain-suffix">@gmail.com</span>
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <label for="passwordInput">Password</label>
-                    <input type="password" id="passwordInput" placeholder="••••••••" required autocomplete="current-password">
-                </div>
-
-                <button type="submit" id="submitBtn" class="primary-btn">Log In</button>
-            </form>
-
-            <p class="switch-text">
-                <span id="toggleText">Don't have an account?</span> 
-                <a href="#" id="toggleLink">Create one</a>
-            </p>
-            <div id="errorMessage" class="error-msg"></div>
+    <div class="login-container">
+        <div class="login-header">
+            <h2>Welcome Back</h2>
+            <p>Please enter your credentials to log in.</p>
         </div>
 
-        <!-- Chat Dashboard Home Page -->
-        <div class="dashboard-box hidden" id="dashboardBox">
-            <header class="chat-header">
-                <div class="user-info">
-                    <h3>RHK Chat</h3>
-                    <span id="userDisplayEmail"></span>
-                </div>
-                <button id="logoutBtn" class="logout-btn">Log Out</button>
-            </header>
-
-            <div class="chat-layout">
-                <!-- Sidebar: User Directory -->
-                <div class="user-sidebar">
-                    <h4>Users</h4>
-                    <div id="userList" class="user-list">
-                        <!-- Populated dynamically -->
-                    </div>
-                </div>
-
-                <!-- Main Chat Window -->
-                <div class="chat-main">
-                    <div id="chatWelcome" class="chat-welcome">
-                        <p>Select a user from the left to start messaging</p>
-                    </div>
-
-                    <div id="activeChatContainer" class="active-chat-container hidden">
-                        <div class="active-chat-header">
-                            <span id="activeChatUser">Chat</span>
-                        </div>
-                        
-                        <div id="messageContainer" class="message-container">
-                            <!-- Messages loaded dynamically -->
-                        </div>
-
-                        <!-- Chat Input Bar -->
-                        <form id="messageForm" class="message-form">
-                            <input type="text" id="messageInput" placeholder="Type a message..." autocomplete="off">
-                            
-                            <!-- Media Share Actions -->
-                            <label for="imageInput" class="media-btn" title="Send Photo">📷</label>
-                            <input type="file" id="imageInput" accept="image/*" class="hidden">
-
-                            <button type="button" id="recordVoiceBtn" class="media-btn" title="Record Voice Note">🎙️</button>
-                            <button type="submit" class="send-btn">Send</button>
-                        </form>
-                        <div id="recordingStatus" class="recording-status hidden">Recording voice message... Click mic again to stop.</div>
-                    </div>
-                </div>
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="username">Username or Email</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required>
             </div>
+
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" id="loginBtn" class="btn primary-btn">Login</button>
+        </form>
+
+        <div class="divider">
+            <span>or</span>
         </div>
+
+        <button type="button" id="createAccountBtn" class="btn secondary-btn">Create New Account</button>
     </div>
 
-    <!-- Firebase & Cloudinary Integration -->
-    <script type="module" src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
