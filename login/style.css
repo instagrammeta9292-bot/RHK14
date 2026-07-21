@@ -117,3 +117,11 @@ body {
 .secondary-btn:hover {
     background-color: #cbd5e1;
 }
+
+.error-msg {
+    color: #ff4d4d;
+    font-size: 13px;
+    text-align: center;
+    margin-top: 10px;
+}
+
