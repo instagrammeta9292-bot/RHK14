@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - RHK App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="login-header">
+            <h2>Welcome Back</h2>
+            <p>Log in to access your account</p>
+        </div>
+
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your username" required>
+            </div>
+
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" id="loginBtn" class="btn primary-btn">Login</button>
+        </form>
+
+        <div id="errorMsg" class="error-msg"></div>
+
+        <div class="divider">
+            <span>or</span>
+        </div>
+
+        <button type="button" id="goToRegisterBtn" class="btn secondary-btn">Create New Account</button>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyAHUju18VBAdDFoQJhsVWp7oUqBxhfwThE",
+          authDomain: "rhk-app-e34c6.firebaseapp.com",
+          projectId: "rhk-app-e34c6",
+          storageBucket: "rhk-app-e34c6.firebasestorage.app",
+          messagingSenderId: "1016565109006",
+          appId: "1:1016565109006:web:eb7ec260a601a16e5ac75f",
+          measurementId: "G-814PTRRQVQ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const usernameInput = document.getElementById('username').value.trim();
+            const passwordInput = document.getElementById('password').value.trim();
+            const errorMsg = document.getElementById('errorMsg');
+            const loginBtn = document.getElementById('loginBtn');
+
+            errorMsg.textContent = "";
+            loginBtn.textContent = "Checking...";
+            loginBtn.disabled = true;
+
+            try {
+                // Query Firestore 'users' collection for matching username and password
+                const usersRef = collection(db, "users");
+                const q = query(usersRef, where("username", "==", usernameInput), where("password", "==", passwordInput));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    // Successful login: grab user data and redirect to him.html
+                    let userData = null;
+                    querySnapshot.forEach((doc) => {
+                        userData = doc.data();
+                    });
+
+                    localStorage.setItem("currentUser", JSON.stringify(userData));
+                    window.location.href = "him.html";
+                } else {
+                    errorMsg.textContent = "Incorrect username or password.";
+                    loginBtn.textContent = "Login";
+                    loginBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error("Login error:", error);
+                errorMsg.textContent = "An error occurred. Please try again.";
+                loginBtn.textContent = "Login";
+                loginBtn.disabled = false;
+            }
+        });
+
+        document.getElementById('goToRegisterBtn').addEventListener('click', () => {
+            window.location.href = "create-newaccount.html";
+        });
+    </script>
+</body>
+</html>
+
