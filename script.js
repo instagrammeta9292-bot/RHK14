@@ -96,3 +96,96 @@ location.href="index.html";
 };
 
 }
+// ---------- LOGIN ----------
+
+const loginBtn = document.getElementById("loginBtn");
+
+if (loginBtn) {
+
+loginBtn.onclick = async () => {
+
+const email = document.getElementById("email").value.trim();
+
+const password = document.getElementById("password").value;
+
+const message = document.getElementById("message");
+
+if (!email || !password) {
+message.innerHTML = "Enter email and password";
+return;
+}
+
+try {
+
+await signInWithEmailAndPassword(
+auth,
+email,
+password
+);
+
+message.innerHTML = "Login Successful...";
+
+setTimeout(() => {
+location.href = "home.html";
+},1000);
+
+} catch (error) {
+
+message.innerHTML = error.message;
+
+}
+
+};
+
+}
+
+
+// ---------- AUTH CHECK ----------
+
+onAuthStateChanged(auth, async(user)=>{
+
+if(!user) return;
+
+const userRef = doc(db,"users",user.uid);
+
+const snap = await getDoc(userRef);
+
+if(!snap.exists()) return;
+
+const data = snap.data();
+
+const profileName = document.getElementById("profileName");
+const profileEmail = document.getElementById("profileEmail");
+const profileUsername = document.getElementById("profileUsername");
+const profileImage = document.getElementById("profileImage");
+
+if(profileName)
+profileName.innerHTML=data.fullname;
+
+if(profileEmail)
+profileEmail.innerHTML=data.email;
+
+if(profileUsername)
+profileUsername.innerHTML="@"+data.username;
+
+if(profileImage)
+profileImage.src=data.photo;
+
+});
+
+
+// ---------- LOGOUT ----------
+
+const logoutBtn=document.getElementById("logoutBtn");
+
+if(logoutBtn){
+
+logoutBtn.onclick=async()=>{
+
+await signOut(auth);
+
+location.href="index.html";
+
+};
+
+}
