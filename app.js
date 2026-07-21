@@ -16,23 +16,21 @@ import {
     getDocs 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Cloudinary Configuration Data
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/nhy9lfkt/image/upload";
 const UPLOAD_PRESET = "rhk_upload";
 
-// Views
+// Screens
 const loginScreen = document.getElementById("login-screen");
 const signupScreen = document.getElementById("signup-screen");
 const forgotScreen = document.getElementById("forgot-screen");
 const dashboardScreen = document.getElementById("dashboard-screen");
 
-// Navigation Links & Buttons
-const showSignupBtn = document.getElementById("show-signup");
-const showForgotBtn = document.getElementById("show-forgot");
-const showLoginFromSignup = document.getElementById("show-login-from-signup");
-const showLoginFromForgot = document.getElementById("show-login-from-forgot");
+// Navigation triggers
+document.getElementById("show-signup").addEventListener("click", (e) => { e.preventDefault(); switchView(signupScreen); });
+document.getElementById("show-forgot").addEventListener("click", (e) => { e.preventDefault(); switchView(forgotScreen); });
+document.getElementById("show-login-from-signup").addEventListener("click", (e) => { e.preventDefault(); switchView(loginScreen); });
+document.getElementById("show-login-from-forgot").addEventListener("click", (e) => { e.preventDefault(); switchView(loginScreen); });
 
-// Action Buttons
 const loginBtnAction = document.getElementById("login-btn-action");
 const signupBtnAction = document.getElementById("signup-btn-action");
 const forgotBtnAction = document.getElementById("forgot-btn-action");
@@ -44,45 +42,36 @@ const avatarPlaceholder = document.getElementById("avatar-placeholder");
 const toggleLoginPass = document.getElementById("toggle-login-pass");
 const loginPasswordInput = document.getElementById("login-password");
 
-// Screen Switcher Helper
-function showView(view) {
+function switchView(targetView) {
     [loginScreen, signupScreen, forgotScreen, dashboardScreen].forEach(v => {
         v.classList.add("hidden");
-        v.style.display = "none";
     });
-    view.classList.remove("hidden");
-    view.style.display = "flex";
+    targetView.classList.remove("hidden");
 }
 
-// Check Session on Load (Persistent login)
+// Session state management
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         try {
             await loadDashboard(user.uid);
-            showView(dashboardScreen);
+            switchView(dashboardScreen);
         } catch (err) {
-            console.error("Dashboard load error:", err);
-            showView(loginScreen);
+            console.error("Dashboard session load error:", err);
+            switchView(loginScreen);
         }
     } else {
-        showView(loginScreen);
+        switchView(loginScreen);
     }
 });
 
-// View Navigation Actions
-showSignupBtn.addEventListener("click", (e) => { e.preventDefault(); showView(signupScreen); });
-showForgotBtn.addEventListener("click", (e) => { e.preventDefault(); showView(forgotScreen); });
-showLoginFromSignup.addEventListener("click", (e) => { e.preventDefault(); showView(loginScreen); });
-showLoginFromForgot.addEventListener("click", (e) => { e.preventDefault(); showView(loginScreen); });
-
-// Toggle password visibility
+// Toggle password view
 toggleLoginPass.addEventListener("click", () => {
     const type = loginPasswordInput.getAttribute("type") === "password" ? "text" : "password";
     loginPasswordInput.setAttribute("type", type);
     toggleLoginPass.textContent = type === "password" ? "👁️" : "🙈";
 });
 
-// Avatar Preview Handler
+// Profile image preview
 avatarInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -96,7 +85,6 @@ avatarInput.addEventListener("change", (e) => {
     }
 });
 
-// Upload to Cloudinary Helper
 async function uploadToCloudinary(file) {
     const formData = new FormData();
     formData.append("file", file);
@@ -114,7 +102,7 @@ async function uploadToCloudinary(file) {
     }
 }
 
-// 1. CREATE ACCOUNT FUNCTIONALITY
+// 1. CREATE NEW ACCOUNT BUTTON
 signupBtnAction.addEventListener("click", async () => {
     const username = document.getElementById("signup-username").value.trim();
     const email = document.getElementById("signup-email").value.trim();
@@ -122,7 +110,7 @@ signupBtnAction.addEventListener("click", async () => {
     const file = avatarInput.files[0];
 
     if (!username || !email || !password || !file) {
-        alert("Please fill in all fields and select a profile photo.");
+        alert("Please complete all fields and select a profile photo.");
         return;
     }
 
@@ -130,22 +118,22 @@ signupBtnAction.addEventListener("click", async () => {
         signupBtnAction.innerText = "CREATING...";
         signupBtnAction.disabled = true;
 
-        // Verify unique username
-        const usernameQuery = query(collection(db, "users"), where("username", "==", username));
-        const usernameSnap = await getDocs(usernameQuery);
-        if (!usernameSnap.empty) {
-            alert("Username is already taken. Please choose another.");
-            signupBtnAction.innerText = "REGISTER ACCOUNT";
-            signupBtnAction.disabled = false;
+        // Check if username already exists in Firestore
+        const q = query(collection(db, "users"), where("username", "==", username));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+            alert("Username is already taken. Choose another.");
             return;
         }
 
-        // Upload photo & create user
+        // Upload photo to Cloudinary
         const photoUrl = await uploadToCloudinary(file);
+
+        // Create Firebase Authentication Account
         const userCred = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCred.user;
 
-        // Save profile mapping to Firestore
+        // Save data to Firestore database mapped by user UID
         await setDoc(doc(db, "users", user.uid), {
             uid: user.uid,
             username: username,
@@ -155,7 +143,7 @@ signupBtnAction.addEventListener("click", async () => {
 
         alert("Account created successfully!");
         await loadDashboard(user.uid);
-        showView(dashboardScreen);
+        switchView(dashboardScreen);
     } catch (error) {
         console.error("Signup error:", error);
         alert(error.message);
@@ -165,13 +153,13 @@ signupBtnAction.addEventListener("click", async () => {
     }
 });
 
-// 2. SIGN IN FUNCTIONALITY (Via Username mapping)
+// 2. SIGN IN BUTTON (Using Username Lookups)
 loginBtnAction.addEventListener("click", async () => {
     const username = document.getElementById("login-username").value.trim();
     const password = document.getElementById("login-password").value.trim();
 
     if (!username || !password) {
-        alert("Please enter both username and password.");
+        alert("Please enter username and password.");
         return;
     }
 
@@ -179,20 +167,21 @@ loginBtnAction.addEventListener("click", async () => {
         loginBtnAction.innerText = "SIGNING IN...";
         loginBtnAction.disabled = true;
 
-        const usernameQuery = query(collection(db, "users"), where("username", "==", username));
-        const querySnapshot = await getDocs(usernameQuery);
+        // Find associated email from Firestore using username
+        const q = query(collection(db, "users"), where("username", "==", username));
+        const querySnapshot = await getDocs(q);
 
         if (querySnapshot.empty) {
             alert("Username not found!");
-            loginBtnAction.innerText = "SIGN IN";
-            loginBtnAction.disabled = false;
             return;
         }
 
         const userData = querySnapshot.docs[0].data();
+        
+        // Sign in using resolved email and user password
         await signInWithEmailAndPassword(auth, userData.email, password);
         await loadDashboard(userData.uid);
-        showView(dashboardScreen);
+        switchView(dashboardScreen);
     } catch (error) {
         console.error("Login error:", error);
         alert("Invalid username or password.");
@@ -202,12 +191,12 @@ loginBtnAction.addEventListener("click", async () => {
     }
 });
 
-// 3. FORGOT PASSWORD FUNCTIONALITY
+// 3. FORGOT PASSWORD BUTTON
 forgotBtnAction.addEventListener("click", async () => {
-    const identifier = document.getElementById("forgot-input").value.trim();
+    const email = document.getElementById("forgot-input").value.trim();
 
-    if (!identifier) {
-        alert("Please enter your username or email.");
+    if (!email) {
+        alert("Please enter your registered email address.");
         return;
     }
 
@@ -215,23 +204,9 @@ forgotBtnAction.addEventListener("click", async () => {
         forgotBtnAction.innerText = "SENDING...";
         forgotBtnAction.disabled = true;
 
-        let emailToReset = identifier;
-
-        if (!identifier.includes("@")) {
-            const usernameQuery = query(collection(db, "users"), where("username", "==", identifier));
-            const querySnapshot = await getDocs(usernameQuery);
-            if (querySnapshot.empty) {
-                alert("No account found with this username.");
-                forgotBtnAction.innerText = "SEND RESET LINK";
-                forgotBtnAction.disabled = false;
-                return;
-            }
-            emailToReset = querySnapshot.docs[0].data().email;
-        }
-
-        await sendPasswordResetEmail(auth, emailToReset);
-        alert("Password reset link sent to your registered email address.");
-        showView(loginScreen);
+        await sendPasswordResetEmail(auth, email);
+        alert("Password reset link has been sent to your email!");
+        switchView(loginScreen);
     } catch (error) {
         console.error("Password reset error:", error);
         alert(error.message);
@@ -241,7 +216,6 @@ forgotBtnAction.addEventListener("click", async () => {
     }
 });
 
-// LOAD DASHBOARD DATA
 async function loadDashboard(uid) {
     const userDoc = await getDoc(doc(db, "users", uid));
     if (userDoc.exists()) {
@@ -251,12 +225,13 @@ async function loadDashboard(uid) {
     }
 }
 
-// LOGOUT FUNCTIONALITY
+// LOGOUT BUTTON
 logoutBtn.addEventListener("click", async () => {
     try {
         await signOut(auth);
-        showView(loginScreen);
+        switchView(loginScreen);
     } catch (error) {
         console.error("Logout error:", error);
     }
 });
+
