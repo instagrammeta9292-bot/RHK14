@@ -32,10 +32,10 @@ const showForgotBtn = document.getElementById("show-forgot");
 const showLoginFromSignup = document.getElementById("show-login-from-signup");
 const showLoginFromForgot = document.getElementById("show-login-from-forgot");
 
-// Forms & Inputs
-const loginForm = document.getElementById("login-form");
-const signupForm = document.getElementById("signup-form");
-const forgotForm = document.getElementById("forgot-form");
+// Action Buttons
+const loginBtnAction = document.getElementById("login-btn-action");
+const signupBtnAction = document.getElementById("signup-btn-action");
+const forgotBtnAction = document.getElementById("forgot-btn-action");
 const logoutBtn = document.getElementById("logout-btn");
 
 const avatarInput = document.getElementById("signup-avatar");
@@ -44,10 +44,14 @@ const avatarPlaceholder = document.getElementById("avatar-placeholder");
 const toggleLoginPass = document.getElementById("toggle-login-pass");
 const loginPasswordInput = document.getElementById("login-password");
 
-// Screen Switcher
+// Screen Switcher Helper
 function showView(view) {
-    [loginScreen, signupScreen, forgotScreen, dashboardScreen].forEach(v => v.classList.add("hidden"));
+    [loginScreen, signupScreen, forgotScreen, dashboardScreen].forEach(v => {
+        v.classList.add("hidden");
+        v.style.display = "none";
+    });
     view.classList.remove("hidden");
+    view.style.display = "flex";
 }
 
 // Check Session on Load (Persistent login)
@@ -111,19 +115,28 @@ async function uploadToCloudinary(file) {
 }
 
 // 1. CREATE ACCOUNT FUNCTIONALITY
-signupForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+signupBtnAction.addEventListener("click", async () => {
     const username = document.getElementById("signup-username").value.trim();
     const email = document.getElementById("signup-email").value.trim();
     const password = document.getElementById("signup-password").value.trim();
     const file = avatarInput.files[0];
 
+    if (!username || !email || !password || !file) {
+        alert("Please fill in all fields and select a profile photo.");
+        return;
+    }
+
     try {
+        signupBtnAction.innerText = "CREATING...";
+        signupBtnAction.disabled = true;
+
         // Verify unique username
         const usernameQuery = query(collection(db, "users"), where("username", "==", username));
         const usernameSnap = await getDocs(usernameQuery);
         if (!usernameSnap.empty) {
             alert("Username is already taken. Please choose another.");
+            signupBtnAction.innerText = "REGISTER ACCOUNT";
+            signupBtnAction.disabled = false;
             return;
         }
 
@@ -146,21 +159,33 @@ signupForm.addEventListener("submit", async (e) => {
     } catch (error) {
         console.error("Signup error:", error);
         alert(error.message);
+    } finally {
+        signupBtnAction.innerText = "REGISTER ACCOUNT";
+        signupBtnAction.disabled = false;
     }
 });
 
 // 2. SIGN IN FUNCTIONALITY (Via Username mapping)
-loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+loginBtnAction.addEventListener("click", async () => {
     const username = document.getElementById("login-username").value.trim();
     const password = document.getElementById("login-password").value.trim();
 
+    if (!username || !password) {
+        alert("Please enter both username and password.");
+        return;
+    }
+
     try {
+        loginBtnAction.innerText = "SIGNING IN...";
+        loginBtnAction.disabled = true;
+
         const usernameQuery = query(collection(db, "users"), where("username", "==", username));
         const querySnapshot = await getDocs(usernameQuery);
 
         if (querySnapshot.empty) {
             alert("Username not found!");
+            loginBtnAction.innerText = "SIGN IN";
+            loginBtnAction.disabled = false;
             return;
         }
 
@@ -171,23 +196,34 @@ loginForm.addEventListener("submit", async (e) => {
     } catch (error) {
         console.error("Login error:", error);
         alert("Invalid username or password.");
+    } finally {
+        loginBtnAction.innerText = "SIGN IN";
+        loginBtnAction.disabled = false;
     }
 });
 
 // 3. FORGOT PASSWORD FUNCTIONALITY
-forgotForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+forgotBtnAction.addEventListener("click", async () => {
     const identifier = document.getElementById("forgot-input").value.trim();
 
+    if (!identifier) {
+        alert("Please enter your username or email.");
+        return;
+    }
+
     try {
+        forgotBtnAction.innerText = "SENDING...";
+        forgotBtnAction.disabled = true;
+
         let emailToReset = identifier;
 
-        // Check if user entered a username instead of an email
         if (!identifier.includes("@")) {
             const usernameQuery = query(collection(db, "users"), where("username", "==", identifier));
             const querySnapshot = await getDocs(usernameQuery);
             if (querySnapshot.empty) {
                 alert("No account found with this username.");
+                forgotBtnAction.innerText = "SEND RESET LINK";
+                forgotBtnAction.disabled = false;
                 return;
             }
             emailToReset = querySnapshot.docs[0].data().email;
@@ -199,6 +235,9 @@ forgotForm.addEventListener("submit", async (e) => {
     } catch (error) {
         console.error("Password reset error:", error);
         alert(error.message);
+    } finally {
+        forgotBtnAction.innerText = "SEND RESET LINK";
+        forgotBtnAction.disabled = false;
     }
 });
 
