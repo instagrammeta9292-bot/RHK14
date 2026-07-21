@@ -1,31 +1,28 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('loginForm');
-    const createAccountBtn = document.getElementById('createAccountBtn');
+const loginForm = document.getElementById("loginForm");
+const createAccount = document.getElementById("createAccount");
 
-    // Handle Login Form Submission
-    loginForm.addEventListener('submit', (event) => {
-        event.preventDefault(); // Prevent page refresh
+loginForm.addEventListener("submit", function(e){
 
-        const usernameInput = document.getElementById('username').value;
-        const passwordInput = document.getElementById('password').value;
+    e.preventDefault();
 
-        // Placeholder logic for future backend integration
-        console.log('Login attempt submitted:');
-        console.log('Username:', usernameInput);
-        console.log('Password:', passwordInput);
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
 
-        alert(`Login button clicked! Username: ${usernameInput}`);
-        
-        // TODO: Add fetch() or AJAX call here later to authenticate with backend
-    });
+    if(username === "" || password === ""){
+        alert("Please enter username and password.");
+        return;
+    }
 
-    // Handle Create New Account Button Click
-    createAccountBtn.addEventListener('click', () => {
-        // Placeholder logic for routing/redirecting to registration page
-        console.log('Redirecting to account creation page...');
-        
-        alert('Create New Account button clicked!');
-        
-        // TODO: Add redirection logic here later, e.g., window.location.href = 'register.html';
-    });
+    alert("Login button clicked.");
+
+    // Later you will connect Firebase login here.
+
+});
+
+createAccount.addEventListener("click", function(){
+
+    alert("Create New Account button clicked.");
+
+    // Later you will redirect to register page.
+
 });
