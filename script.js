@@ -1,191 +1,127 @@
-import {
-  auth,
-  db,
-  CLOUD_NAME,
-  UPLOAD_PRESET,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  doc,
-  setDoc,
-  getDoc
-} from "./firebase.js";
+// Import Firebase SDK modules from CDN
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { 
+    getAuth, 
+    signInWithEmailAndPassword, 
+    createUserWithEmailAndPassword, 
+    onAuthStateChanged, 
+    signOut 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// ---------- CREATE ACCOUNT ----------
+// RHK Configuration Data (Firebase & Cloudinary settings preserved)
+const firebaseConfig = {
+    apiKey: "AIzaSyAHUju18VBAdDFoQJhsVWp7oUqBxhfwThE",
+    authDomain: "rhk-app-e34c6.firebaseapp.com",
+    projectId: "rhk-app-e34c6",
+    storageBucket: "rhk-app-e34c6.firebasestorage.app",
+    messagingSenderId: "1016565109006",
+    appId: "1:1016565109006:web:eb7ec260a601a16e5ac75f",
+    measurementId: "G-814PTRRQVQ"
+};
 
-const signupBtn = document.getElementById("signupBtn");
+// Global Cloudinary Configuration References (Stored for future expansion)
+window.RHK_CLOUDINARY_CONFIG = {
+    cloudName: "nhy9lfkt",
+    uploadPreset: "rhk_upload"
+};
 
-if (signupBtn) {
+// Initialize Firebase App & Auth
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-signupBtn.onclick = async () => {
+// DOM Elements
+const authBox = document.getElementById("authBox");
+const dashboardBox = document.getElementById("dashboardBox");
+const authForm = document.getElementById("authForm");
+const usernameInput = document.getElementById("usernameInput");
+const passwordInput = document.getElementById("passwordInput");
+const submitBtn = document.getElementById("submitBtn");
+const formTitle = document.getElementById("formTitle");
+const formSubtitle = document.getElementById("formSubtitle");
+const toggleText = document.getElementById("toggleText");
+const toggleLink = document.getElementById("toggleLink");
+const errorMessage = document.getElementById("errorMessage");
+const userDisplayEmail = document.getElementById("userDisplayEmail");
+const logoutBtn = document.getElementById("logoutBtn");
 
-const fullname = document.getElementById("fullname").value.trim();
+// State flag to switch between Login (false) and Signup (true)
+let isSignUpMode = false;
 
-const username = document.getElementById("username").value.trim().toLowerCase();
+// Toggle between Login and Signup modes
+toggleLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    isSignUpMode = !isSignUpMode;
+    errorMessage.textContent = "";
 
-const email = document.getElementById("email").value.trim();
-
-const password = document.getElementById("password").value;
-
-const photo = document.getElementById("photo").files[0];
-
-const message = document.getElementById("message");
-
-if (
-!fullname ||
-!username ||
-!email ||
-!password
-){
-message.innerHTML="Please fill all fields";
-return;
-}
-
-message.innerHTML="Uploading image...";
-
-let imageUrl="";
-
-if(photo){
-
-const formData=new FormData();
-
-formData.append("file",photo);
-
-formData.append("upload_preset",UPLOAD_PRESET);
-
-const upload=await fetch(
-`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-{
-method:"POST",
-body:formData
+    if (isSignUpMode) {
+        formTitle.textContent = "Create RHK Account";
+        formSubtitle.textContent = "Sign up to join the brand network";
+        submitBtn.textContent = "Sign Up";
+        toggleText.textContent = "Already have an account?";
+        toggleLink.textContent = "Log in";
+    } else {
+        formTitle.textContent = "RHK Login";
+        formSubtitle.textContent = "Enter your credentials to continue";
+        submitBtn.textContent = "Log In";
+        toggleText.textContent = "Don't have an account?";
+        toggleLink.textContent = "Create one";
+    }
 });
 
-const result=await upload.json();
+// Handle Form Submission (Login or Sign Up)
+authForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errorMessage.textContent = "";
 
-imageUrl=result.secure_url;
+    // Automatically construct full Gmail address from username input
+    const cleanUsername = usernameInput.value.trim().toLowerCase();
+    const fullEmail = `${cleanUsername}@gmail.com`;
+    const password = passwordInput.value;
 
-}
-
-message.innerHTML="Creating account...";
-
-const userCredential =
-await createUserWithEmailAndPassword(
-auth,
-email,
-password
-);
-
-await setDoc(
-doc(db,"users",userCredential.user.uid),
-{
-fullname,
-username,
-email,
-photo:imageUrl,
-createdAt:new Date().toISOString()
-}
-);
-
-message.innerHTML="Account created successfully!";
-
-setTimeout(()=>{
-location.href="index.html";
-},1500);
-
-};
-
-}
-// ---------- LOGIN ----------
-
-const loginBtn = document.getElementById("loginBtn");
-
-if (loginBtn) {
-
-loginBtn.onclick = async () => {
-
-const email = document.getElementById("email").value.trim();
-
-const password = document.getElementById("password").value;
-
-const message = document.getElementById("message");
-
-if (!email || !password) {
-message.innerHTML = "Enter email and password";
-return;
-}
-
-try {
-
-await signInWithEmailAndPassword(
-auth,
-email,
-password
-);
-
-message.innerHTML = "Login Successful...";
-
-setTimeout(() => {
-location.href = "home.html";
-},1000);
-
-} catch (error) {
-
-message.innerHTML = error.message;
-
-}
-
-};
-
-}
-
-
-// ---------- AUTH CHECK ----------
-
-onAuthStateChanged(auth, async(user)=>{
-
-if(!user) return;
-
-const userRef = doc(db,"users",user.uid);
-
-const snap = await getDoc(userRef);
-
-if(!snap.exists()) return;
-
-const data = snap.data();
-
-const profileName = document.getElementById("profileName");
-const profileEmail = document.getElementById("profileEmail");
-const profileUsername = document.getElementById("profileUsername");
-const profileImage = document.getElementById("profileImage");
-
-if(profileName)
-profileName.innerHTML=data.fullname;
-
-if(profileEmail)
-profileEmail.innerHTML=data.email;
-
-if(profileUsername)
-profileUsername.innerHTML="@"+data.username;
-
-if(profileImage)
-profileImage.src=data.photo;
-
+    try {
+        if (isSignUpMode) {
+            // Create user account in Firebase Auth
+            await createUserWithEmailAndPassword(auth, fullEmail, password);
+        } else {
+            // Log user in
+            await signInWithEmailAndPassword(auth, fullEmail, password);
+        }
+    } catch (error) {
+        // Clean up Firebase error messages for user readability
+        let msg = error.message;
+        if (error.code === 'auth/invalid-credential') {
+            msg = "Incorrect username or password.";
+        } else if (error.code === 'auth/email-already-in-use') {
+            msg = "This username is already taken.";
+        } else if (error.code === 'auth/weak-password') {
+            msg = "Password should be at least 6 characters.";
+        }
+        errorMessage.textContent = msg;
+    }
 });
 
+// Monitor Auth State Changes to Switch Views
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        // Logged in
+        authBox.classList.add("hidden");
+        dashboardBox.classList.remove("hidden");
+        userDisplayEmail.textContent = user.email.split('@')[0];
+    } else {
+        // Logged out
+        authBox.classList.remove("hidden");
+        dashboardBox.classList.add("hidden");
+        usernameInput.value = "";
+        passwordInput.value = "";
+        errorMessage.textContent = "";
+    }
+});
 
-// ---------- LOGOUT ----------
-
-const logoutBtn=document.getElementById("logoutBtn");
-
-if(logoutBtn){
-
-logoutBtn.onclick=async()=>{
-
-await signOut(auth);
-
-location.href="index.html";
-
-};
-
-}
+// Handle Logout
+logoutBtn.addEventListener("click", async () => {
+    try {
+        await signOut(auth);
+    } catch (error) {
+        console.error("Error signing out:", error);
+    }
+});
