@@ -19,7 +19,7 @@
                     <p>SIGN IN TO RHK</p>
                 </div>
 
-                <form id="login-form" onsubmit="return false;">
+                <div id="login-form">
                     <div class="input-group">
                         <label>Username</label>
                         <div class="input-field-wrapper">
@@ -38,7 +38,7 @@
                     </div>
 
                     <button type="button" id="login-btn-action" class="btn-primary">SIGN IN</button>
-                </form>
+                </div>
 
                 <div class="extra-links">
                     <a href="#" id="show-forgot">Forgot Password?</a>
@@ -58,13 +58,13 @@
                     <p>CREATE NEW ACCOUNT</p>
                 </div>
 
-                <form id="signup-form" onsubmit="return false;">
+                <div id="signup-form">
                     <div class="avatar-upload-container">
                         <label for="signup-avatar" class="avatar-label">
                             <img id="avatar-preview" src="" alt="Avatar" class="hidden">
                             <span id="avatar-placeholder">+ Add Photo</span>
                         </label>
-                        <input type="file" id="signup-avatar" accept="image/*" required>
+                        <input type="file" id="signup-avatar" accept="image/*">
                     </div>
 
                     <div class="input-group">
@@ -76,7 +76,7 @@
                     </div>
 
                     <div class="input-group">
-                        <label>Email (for recovery)</label>
+                        <label>Email (for login & recovery)</label>
                         <div class="input-field-wrapper">
                             <span class="icon">✉️</span>
                             <input type="email" id="signup-email" placeholder="name@example.com" required>
@@ -92,7 +92,7 @@
                     </div>
 
                     <button type="button" id="signup-btn-action" class="btn-primary">REGISTER ACCOUNT</button>
-                </form>
+                </div>
 
                 <div class="extra-links center-link">
                     <a href="#" id="show-login-from-signup">Back to Sign In</a>
@@ -106,18 +106,18 @@
                     <p>RESET PASSWORD</p>
                 </div>
 
-                <form id="forgot-form" onsubmit="return false;">
-                    <p class="instruction-text">Enter your account username or registered email to receive a password reset link.</p>
+                <div id="forgot-form">
+                    <p class="instruction-text">Enter your registered email address to receive a password reset link.</p>
                     <div class="input-group">
-                        <label>Username or Email</label>
+                        <label>Email Address</label>
                         <div class="input-field-wrapper">
                             <span class="icon">✉️</span>
-                            <input type="text" id="forgot-input" placeholder="username or email" required>
+                            <input type="email" id="forgot-input" placeholder="name@example.com" required>
                         </div>
                     </div>
 
                     <button type="button" id="forgot-btn-action" class="btn-primary">SEND RESET LINK</button>
-                </form>
+                </div>
 
                 <div class="extra-links center-link">
                     <a href="#" id="show-login-from-forgot">Back to Sign In</a>
