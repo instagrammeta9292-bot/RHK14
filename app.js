@@ -2,6 +2,7 @@ import { auth, db } from "./firebase.js";
 import { 
     createUserWithEmailAndPassword, 
     signInWithEmailAndPassword, 
+    sendPasswordResetEmail,
     signOut, 
     onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -19,22 +20,65 @@ import {
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/nhy9lfkt/image/upload";
 const UPLOAD_PRESET = "rhk_upload";
 
-// DOM Elements
+// Views
 const loginScreen = document.getElementById("login-screen");
 const signupScreen = document.getElementById("signup-screen");
+const forgotScreen = document.getElementById("forgot-screen");
 const dashboardScreen = document.getElementById("dashboard-screen");
 
+// Navigation Links & Buttons
+const showSignupBtn = document.getElementById("show-signup");
+const showForgotBtn = document.getElementById("show-forgot");
+const showLoginFromSignup = document.getElementById("show-login-from-signup");
+const showLoginFromForgot = document.getElementById("show-login-from-forgot");
+
+// Forms & Inputs
 const loginForm = document.getElementById("login-form");
 const signupForm = document.getElementById("signup-form");
+const forgotForm = document.getElementById("forgot-form");
 const logoutBtn = document.getElementById("logout-btn");
-
-const showSignupLink = document.getElementById("show-signup");
-const showLoginLink = document.getElementById("show-login");
 
 const avatarInput = document.getElementById("signup-avatar");
 const avatarPreview = document.getElementById("avatar-preview");
+const avatarPlaceholder = document.getElementById("avatar-placeholder");
+const toggleLoginPass = document.getElementById("toggle-login-pass");
+const loginPasswordInput = document.getElementById("login-password");
 
-// Handle image preview selection
+// Screen Switcher
+function showView(view) {
+    [loginScreen, signupScreen, forgotScreen, dashboardScreen].forEach(v => v.classList.add("hidden"));
+    view.classList.remove("hidden");
+}
+
+// Check Session on Load (Persistent login)
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        try {
+            await loadDashboard(user.uid);
+            showView(dashboardScreen);
+        } catch (err) {
+            console.error("Dashboard load error:", err);
+            showView(loginScreen);
+        }
+    } else {
+        showView(loginScreen);
+    }
+});
+
+// View Navigation Actions
+showSignupBtn.addEventListener("click", (e) => { e.preventDefault(); showView(signupScreen); });
+showForgotBtn.addEventListener("click", (e) => { e.preventDefault(); showView(forgotScreen); });
+showLoginFromSignup.addEventListener("click", (e) => { e.preventDefault(); showView(loginScreen); });
+showLoginFromForgot.addEventListener("click", (e) => { e.preventDefault(); showView(loginScreen); });
+
+// Toggle password visibility
+toggleLoginPass.addEventListener("click", () => {
+    const type = loginPasswordInput.getAttribute("type") === "password" ? "text" : "password";
+    loginPasswordInput.setAttribute("type", type);
+    toggleLoginPass.textContent = type === "password" ? "👁️" : "🙈";
+});
+
+// Avatar Preview Handler
 avatarInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -42,46 +86,13 @@ avatarInput.addEventListener("change", (e) => {
         reader.onload = (event) => {
             avatarPreview.src = event.target.result;
             avatarPreview.classList.remove("hidden");
+            avatarPlaceholder.classList.add("hidden");
         };
         reader.readAsDataURL(file);
     }
 });
 
-// Switch screens helper
-function showScreen(screen) {
-    [loginScreen, signupScreen, dashboardScreen].forEach(s => s.classList.add("hidden"));
-    screen.classList.remove("hidden");
-}
-
-// Instant Auth State Check (No delay/splash screen)
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        // User is logged in -> Directly go to Home/Dashboard page
-        try {
-            await loadDashboard(user.uid);
-            showScreen(dashboardScreen);
-        } catch (err) {
-            console.error("Error loading dashboard data:", err);
-            showScreen(loginScreen);
-        }
-    } else {
-        // Not logged in -> Show login page
-        showScreen(loginScreen);
-    }
-});
-
-// Toggle Navigation Links
-showSignupLink.addEventListener("click", (e) => {
-    e.preventDefault();
-    showScreen(signupScreen);
-});
-
-showLoginLink.addEventListener("click", (e) => {
-    e.preventDefault();
-    showScreen(loginScreen);
-});
-
-// Upload Image to Cloudinary Function
+// Upload to Cloudinary Helper
 async function uploadToCloudinary(file) {
     const formData = new FormData();
     formData.append("file", file);
@@ -95,11 +106,11 @@ async function uploadToCloudinary(file) {
     if (data.secure_url) {
         return data.secure_url;
     } else {
-        throw new Error("Failed to upload image to Cloudinary");
+        throw new Error("Cloudinary image upload failed.");
     }
 }
 
-// SIGNUP LOGIC
+// 1. CREATE ACCOUNT FUNCTIONALITY
 signupForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const username = document.getElementById("signup-username").value.trim();
@@ -108,17 +119,20 @@ signupForm.addEventListener("submit", async (e) => {
     const file = avatarInput.files[0];
 
     try {
+        // Verify unique username
         const usernameQuery = query(collection(db, "users"), where("username", "==", username));
-        const usernameSnapshot = await getDocs(usernameQuery);
-        if (!usernameSnapshot.empty) {
-            alert("Username is already taken. Choose another one.");
+        const usernameSnap = await getDocs(usernameQuery);
+        if (!usernameSnap.empty) {
+            alert("Username is already taken. Please choose another.");
             return;
         }
 
+        // Upload photo & create user
         const photoUrl = await uploadToCloudinary(file);
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
+        const userCred = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCred.user;
 
+        // Save profile mapping to Firestore
         await setDoc(doc(db, "users", user.uid), {
             uid: user.uid,
             username: username,
@@ -128,14 +142,14 @@ signupForm.addEventListener("submit", async (e) => {
 
         alert("Account created successfully!");
         await loadDashboard(user.uid);
-        showScreen(dashboardScreen);
+        showView(dashboardScreen);
     } catch (error) {
         console.error("Signup error:", error);
         alert(error.message);
     }
 });
 
-// LOGIN LOGIC
+// 2. SIGN IN FUNCTIONALITY (Via Username mapping)
 loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const username = document.getElementById("login-username").value.trim();
@@ -151,14 +165,40 @@ loginForm.addEventListener("submit", async (e) => {
         }
 
         const userData = querySnapshot.docs[0].data();
-        const email = userData.email;
-
-        await signInWithEmailAndPassword(auth, email, password);
+        await signInWithEmailAndPassword(auth, userData.email, password);
         await loadDashboard(userData.uid);
-        showScreen(dashboardScreen);
+        showView(dashboardScreen);
     } catch (error) {
         console.error("Login error:", error);
-        alert("Invalid login credentials.");
+        alert("Invalid username or password.");
+    }
+});
+
+// 3. FORGOT PASSWORD FUNCTIONALITY
+forgotForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const identifier = document.getElementById("forgot-input").value.trim();
+
+    try {
+        let emailToReset = identifier;
+
+        // Check if user entered a username instead of an email
+        if (!identifier.includes("@")) {
+            const usernameQuery = query(collection(db, "users"), where("username", "==", identifier));
+            const querySnapshot = await getDocs(usernameQuery);
+            if (querySnapshot.empty) {
+                alert("No account found with this username.");
+                return;
+            }
+            emailToReset = querySnapshot.docs[0].data().email;
+        }
+
+        await sendPasswordResetEmail(auth, emailToReset);
+        alert("Password reset link sent to your registered email address.");
+        showView(loginScreen);
+    } catch (error) {
+        console.error("Password reset error:", error);
+        alert(error.message);
     }
 });
 
@@ -172,11 +212,11 @@ async function loadDashboard(uid) {
     }
 }
 
-// LOGOUT LOGIC
+// LOGOUT FUNCTIONALITY
 logoutBtn.addEventListener("click", async () => {
     try {
         await signOut(auth);
-        showScreen(loginScreen);
+        showView(loginScreen);
     } catch (error) {
         console.error("Logout error:", error);
     }
