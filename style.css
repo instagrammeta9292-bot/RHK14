@@ -1,160 +1,263 @@
+/* --- Variables for RHK Theme --- */
+:root {
+    --bg-deep: #0c1017;
+    --bg-panel: #161b22; /* Dark brushed metal background color */
+    --text-gold: #c9a96e; /* The specific gold color from image_0.png */
+    --text-muted: #8b949e;
+    --border-gold: #c9a96e;
+    --input-bg: #0d1117;
+    --btn-hover-gold: rgba(201, 169, 110, 0.1);
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 body {
-    background: #0f172a;
+    background-color: #000; /* Fallback */
+    /* Replicating the textured marble background environment */
+    background-image: url('https://i.ibb.co/0YgGgQn/144333.png'); 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     color: #f8fafc;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    padding: 20px;
 }
 
 .container {
     width: 100%;
-    max-width: 400px;
-    padding: 20px;
+    max-width: 390px; /* Matches standard iPhone width */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.auth-box, .dashboard-box {
-    background: #1e293b;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    border: 1px solid #334155;
+/* The main authentication card simulating the phone screen */
+.auth-box {
+    background: var(--bg-panel);
+    width: 100%;
+    padding: 40px 30px;
+    border-radius: 32px; /* Rounded corners like a phone */
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+    border: 1px solid #30363d;
+    position: relative;
+    /* Subtle gradient overlay to mimic brushed metal */
+    background-image: 
+        linear-gradient(to bottom right, rgba(255,255,255,0.05), transparent),
+        radial-gradient(at top right, rgba(201, 169, 110, 0.1), transparent 70%);
 }
 
-h2 {
-    font-size: 1.8rem;
-    margin-bottom: 5px;
-    color: #ffffff;
+/* RHK Logo at the top */
+.rhk-logo {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--text-gold);
     text-align: center;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .subtitle {
-    color: #94a3b8;
-    font-size: 0.9rem;
-    margin-bottom: 25px;
+    color: var(--text-gold);
+    font-size: 0.8rem;
+    margin-bottom: 40px;
     text-align: center;
+    font-weight: 400;
+    letter-spacing: 1px;
 }
 
 .input-group {
     margin-bottom: 20px;
+    text-align: left;
 }
 
 .input-group label {
-    display: block;
-    font-size: 0.85rem;
-    margin-bottom: 8px;
-    color: #cbd5e1;
-    font-weight: 600;
+    display: none; /* Hide labels visually as placeholders are used */
 }
 
 .input-wrapper {
+    position: relative;
     display: flex;
     align-items: center;
-    background: #0f172a;
-    border: 1px solid #475569;
+    background: var(--input-bg);
+    border: 1px solid #484f58;
     border-radius: 8px;
-    overflow: hidden;
+    transition: border-color 0.2s;
+    height: 50px;
 }
 
 .input-wrapper:focus-within {
-    border-color: #38bdf8;
+    border-color: var(--border-gold);
+    box-shadow: 0 0 0 2px rgba(201, 169, 110, 0.2);
+}
+
+/* Styling for icons inside inputs */
+.field-icon {
+    width: 20px;
+    height: 20px;
+    opacity: 0.7;
+}
+
+.icon-left .field-icon {
+    position: absolute;
+    left: 15px;
+}
+
+.icon-left input {
+    padding-left: 50px; /* Space for left icon */
+}
+
+.icon-right input {
+    padding-right: 50px; /* Space for right icon/toggle */
 }
 
 .input-wrapper input {
     flex: 1;
     background: transparent;
     border: none;
-    padding: 12px;
+    padding: 12px 0;
     color: #fff;
     font-size: 1rem;
     outline: none;
 }
 
+.input-wrapper input::placeholder {
+    color: #6e7681;
+}
+
+/* The @gmail.com suffix */
 .domain-suffix {
-    padding-right: 12px;
-    color: #64748b;
-    font-size: 0.95rem;
+    padding-right: 15px;
+    color: #6e7681;
+    font-size: 0.9rem;
     user-select: none;
 }
 
-input[type="password"] {
-    width: 100%;
-    background: #0f172a;
-    border: 1px solid #475569;
-    border-radius: 8px;
-    padding: 12px;
-    color: #fff;
-    font-size: 1rem;
-    outline: none;
+/* Password toggle eye icon */
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
 }
 
-input[type="password"]:focus {
-    border-color: #38bdf8;
+.toggle-password img {
+    width: 20px;
+    height: 20px;
+    opacity: 0.6;
 }
 
-.primary-btn, .secondary-btn {
+.toggle-password:hover img {
+    opacity: 1;
+}
+
+/* Main Sign In Button (Solid Goldish style) */
+.primary-btn {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     border: none;
     border-radius: 8px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
-}
-
-.primary-btn {
-    background: #38bdf8;
-    color: #0f172a;
-    margin-top: 10px;
+    transition: all 0.2s;
+    background-color: var(--text-gold); /* Gold */
+    color: var(--bg-deep); /* Dark text */
+    margin-top: 20px;
+    letter-spacing: 0.5px;
 }
 
 .primary-btn:hover {
-    background: #0ea5e9;
+    background-color: #b8975e;
 }
 
-.secondary-btn {
-    background: #ef4444;
-    color: #fff;
-    margin-top: 20px;
-}
-
-.secondary-btn:hover {
-    background: #dc2626;
-}
-
-.switch-text {
+/* OR Divider */
+.or-divider {
+    display: flex;
+    align-items: center;
     text-align: center;
-    margin-top: 20px;
-    font-size: 0.9rem;
-    color: #94a3b8;
+    margin: 25px 0;
+    color: var(--text-muted);
+    font-size: 0.75rem;
 }
 
-.switch-text a {
-    color: #38bdf8;
-    text-decoration: none;
+.or-divider::before,
+.or-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #30363d;
+}
+
+.or-divider span {
+    padding: 0 10px;
+}
+
+/* Secondary Button (Gold Outline style) */
+.secondary-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 1rem;
     font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+    box-sizing: border-box;
 }
 
-.switch-text a:hover {
-    text-decoration: underline;
+.outline-btn {
+    background: transparent;
+    border: 1px solid var(--border-gold);
+    color: var(--text-gold);
+}
+
+.outline-btn:hover {
+    background-color: var(--btn-hover-gold);
 }
 
 .error-msg {
-    color: #f87171;
+    color: #ff7b72;
     font-size: 0.85rem;
     text-align: center;
-    margin-top: 15px;
+    margin-top: 20px;
     min-height: 20px;
+}
+
+/* Dashboard View (Post-Login) */
+.dashboard-box {
+    background: var(--bg-panel);
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid #30363d;
+    width: 100%;
+}
+
+#logoutBtn {
+    background-color: #da3633;
+    color: white;
+    border: none;
+    margin-top: 30px;
+    width: auto;
+    padding: 10px 20px;
+}
+
+#logoutBtn:hover {
+    background-color: #b62322;
 }
 
 .hidden {
     display: none;
 }
+
