@@ -1,43 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RHK Login</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>RHK Chat - Login</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
 </head>
+
 <body>
 
-<div class="container">
+<div class="login-box">
 
-    <div class="logo">
-        <h1>RHK</h1>
-        <p>Brand Login</p>
-    </div>
+    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+         class="logo">
 
-    <form id="loginForm">
+    <h1>RHK CHAT</h1>
 
-        <div class="input-box">
-            <input type="text" id="username" placeholder="Username" required>
-        </div>
+    <p>Login with your Email</p>
 
-        <div class="input-box">
-            <input type="password" id="password" placeholder="Password" required>
-        </div>
+    <input
+        type="email"
+        id="email"
+        placeholder="Email Address">
 
-        <button type="submit" class="login-btn">
-            Login
-        </button>
+    <input
+        type="password"
+        id="password"
+        placeholder="Password">
 
-        <button type="button" id="createAccount" class="create-btn">
-            Create New Account
-        </button>
+    <button id="loginBtn">
+        Login
+    </button>
 
-    </form>
+    <button id="signupBtn" class="createBtn">
+        Create New Account
+    </button>
 
 </div>
 
-<script src="script.js"></script>
+<script src="js/firebase.js"></script>
+<script src="js/login.js"></script>
 
 </body>
 </html>
